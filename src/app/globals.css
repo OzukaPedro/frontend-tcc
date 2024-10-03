@@ -2,26 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: "graphik-bold";
+  src: url("../fonts/graphik/Graphik-Bold-Trial.otf");
+  font-style: normal;
+  font-display: swap;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@font-face {
+  font-family: "graphik-regular";
+  src: url("../fonts/graphik/Graphik-Regular-Trial.otf");
+  font-style: normal;
+  font-display: swap;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@font-face {
+  font-family: "inter";
+  src: url("https://rsms.me/inter/inter.css");
+  font-style: normal;
+  font-display: swap;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+@font-face {
+  font-family: "inter-bold";
+  src: url("../fonts/inter/Inter-Bold.woff2");
+  font-style: normal;
+  font-display: swap;
 }
