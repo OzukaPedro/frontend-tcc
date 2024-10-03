@@ -7,6 +7,12 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        "graphik-Regular": ["graphik-regular", "sans-serif"],
+        "graphik-Bold": ["graphik-bold", "sans-serif"],
+        inter: ["inter", "sans-serif"],
+        "inter-bold": ["inter-bold", "sans-serif"],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
