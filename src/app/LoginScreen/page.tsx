@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./page.module.css";
 
-const HomePage: React.FC = () => {
+const LoginScreen: React.FC = () => {
   return (
     <div className={styles.hero}>
       <div className={styles.overlay}></div>
@@ -16,12 +16,12 @@ const HomePage: React.FC = () => {
             <p>Senha</p>
             <input type="password" className={styles.inputs} />
           </div>
-          <div className={styles.checkContainer}>
-            <div className={styles.checkbox}>
-              <input type="checkbox" />
+          <div className={styles.checkboxContainer}>
+            <div className={styles.checkboxBox}>
+              <input type="checkbox" className={styles.checkboxBox} />
               <p>Lembrar</p>
             </div>
-            <div className={styles.checkbox}>
+            <div>
               <p>
                 Não possui uma conta?{" "}
                 <a href="#" className={styles.link}>
@@ -37,4 +37,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default LoginScreen;

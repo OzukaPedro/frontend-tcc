@@ -29,8 +29,8 @@
 .box {
   background: #262626;
   padding: 50px;
-  padding-top: 30px;
-  padding-bottom: 30px;
+  padding-top: 40px;
+  padding-bottom: 40px;
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -54,7 +54,7 @@
 
 .inputs {
   font-family: inherit;
-  width: 50vh;
+  width: 60vh;
   border: 0;
   border-bottom: 2px solid #9b9b9b;
   outline: 0;
@@ -73,16 +73,18 @@
     top: 20px;
   }
 }
-.checkContainer {
+.checkboxContainer {
+  width: 60vh;
   display: flex;
-}
-.checkbox {
-  display: flex;
-  color: #bbb6b6;
   justify-content: space-between;
 }
+.checkboxBox {
+  width: screen;
+  display: flex;
+  gap: 5px;
+}
 .buttons {
-  width: 50vh;
+  width: 60vh;
   display: flex;
   justify-content: center;
   margin-top: 1rem;

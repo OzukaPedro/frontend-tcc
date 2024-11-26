@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./page.module.css";
 
-const HomePage: React.FC = () => {
+const RegisterScreen: React.FC = () => {
   return (
     <div className={styles.hero}>
       <div className={styles.overlay}></div>
@@ -39,4 +39,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default RegisterScreen;
