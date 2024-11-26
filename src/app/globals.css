@@ -1,42 +1,23 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* src/app/globals.css */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* Definição de variáveis globais */
 * {
-  box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+:root {
+  --primary-color: #ff6600; /* Cor para botões e destaque */
+  --secondary-color: #ffffff; /* Cor para textos e botões secundários */
+  --background-image: url("https://source.unsplash.com/1920x1080/?mountains"); /* Imagem de fundo */
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* Outras estilizações globais podem ser colocadas aqui */
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
+  line-height: 1.5;
+  background-color: #f4f4f4;
 }
