@@ -1,0 +1,52 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #262626;
+  color: #e76f00;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.logoImage {
+  height: 30px;
+  width: 30px;
+  margin-right: 10px;
+}
+
+.menu {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+.menu li {
+  position: relative;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #d9d9d9;
+  font-size: 1rem;
+}
+
+.menu a:hover {
+  color: #ff6600;
+}
+
+.userIcon img {
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+}
+
+.userIcon {
+  display: flex;
+  align-items: center;
+}
