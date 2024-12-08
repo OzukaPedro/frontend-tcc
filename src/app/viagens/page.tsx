@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import styled from 'styled-components';
-import { Button, IconButton, TextField } from '@mui/material';
-import { ExpandMore, Delete, Edit, Print, Add } from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import api from "../../utils/api";
+import styled from "styled-components";
+import { Button, IconButton, TextField } from "@mui/material";
+import { ExpandMore, Delete, Edit, Print, Add } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 import { AppContainer, AppCard } from "../../styles/global";
-import SearchButton  from '../../components/SearchButton';
+import SearchButton from "../../components/SearchButton";
 
 const Container = styled.div`
   padding: 2rem;
@@ -29,7 +29,7 @@ const Header = styled.div`
 `;
 
 const ExpandableContent = styled.div<{ isExpanded: boolean }>`
-  max-height: ${(props) => (props.isExpanded ? '500px' : '0')};
+  max-height: ${(props) => (props.isExpanded ? "500px" : "0")};
   overflow: hidden;
   transition: max-height 0.3s ease;
 `;
@@ -45,38 +45,38 @@ export default function ViagensPage() {
   const [viagens, setViagens] = useState([
     {
       id: 1,
-      nome: 'Viagem de Férias',
+      nome: "Viagem de Férias",
       valorTotal: 1000,
-      tipo: 'viagem',
-      cidadeOrigem: 'São Paulo',
-      ufOrigem: 'SP',
-      cidadeDestino: 'Rio de Janeiro',
-      ufDestino: 'RJ',
+      tipo: "viagem",
+      cidadeOrigem: "São Paulo",
+      ufOrigem: "SP",
+      cidadeDestino: "Rio de Janeiro",
+      ufDestino: "RJ",
     },
     {
       id: 2,
-      nome: 'Viagem de Trabalho',
+      nome: "Viagem de Trabalho",
       valorTotal: 2000,
-      tipo: 'trabalho',
-      cidadeOrigem: 'São Paulo',
-      ufOrigem: 'SP',
-      cidadeDestino: 'Curitiba',
-      ufDestino: 'PR',
+      tipo: "trabalho",
+      cidadeOrigem: "São Paulo",
+      ufOrigem: "SP",
+      cidadeDestino: "Curitiba",
+      ufDestino: "PR",
     },
   ]);
-  const [busca, setBusca] = useState('');
+  const [busca, setBusca] = useState("");
   const [expandedViagem, setExpandedViagem] = useState(null);
 
   useEffect(() => {
     fetchViagens();
   }, []);
 
-  const fetchViagens = async (query = '') => {
+  const fetchViagens = async (query = "") => {
     try {
-      const response = await axios.get(`/api/viagens?busca=${query}`);
+      const response = await api.get(`/api/viagems?busca=${query}`);
       setViagens(response.data);
     } catch (error) {
-      console.error('Erro ao buscar viagens:', error);
+      console.error("Erro ao buscar viagens:", error);
     }
   };
 
@@ -88,22 +88,22 @@ export default function ViagensPage() {
 
   const handleRemover = async (id) => {
     try {
-      await axios.delete(`/api/viagens/${id}`);
+      await api.delete(`/api/viagems/${id}`);
       setViagens((prev) => prev.filter((viagem) => viagem.id !== id));
     } catch (error) {
-      console.error('Erro ao remover viagem:', error);
+      console.error("Erro ao remover viagem:", error);
     }
   };
-  
+
   const handleEdit = (id = null) => {
-    if(id) return router.push(`/viagens/${id}`);
+    if (id) return router.push(`/viagens/${id}`);
     return router.push(`/viagens/novo`);
-  }
+  };
 
   return (
     <AppContainer>
       <h1>Lista de Viagens</h1>
-      
+
       <SearchContainer>
         <SearchButton />
         <IconButton onClick={() => handleEdit()}>
@@ -124,17 +124,30 @@ export default function ViagensPage() {
               <IconButton onClick={() => router.push(`/viagens/${viagem.id}`)}>
                 <Edit />
               </IconButton>
-              <IconButton color="error" onClick={() => handleRemover(viagem.id)}>
+              <IconButton
+                color="error"
+                onClick={() => handleRemover(viagem.id)}
+              >
                 <Delete />
               </IconButton>
             </div>
           </Header>
           <ExpandableContent isExpanded={expandedViagem === viagem.id}>
-            <p><strong>Cidade de Origem:</strong> {viagem.cidadeOrigem}</p>
-            <p><strong>UF de Origem:</strong> {viagem.ufOrigem}</p>
-            <p><strong>Cidade de Destino:</strong> {viagem.cidadeDestino}</p>
-            <p><strong>UF de Destino:</strong> {viagem.ufDestino}</p>
-            <p><strong>Valor total:</strong> {viagem.valorTotal}</p>
+            <p>
+              <strong>Cidade de Origem:</strong> {viagem.cidadeOrigem}
+            </p>
+            <p>
+              <strong>UF de Origem:</strong> {viagem.ufOrigem}
+            </p>
+            <p>
+              <strong>Cidade de Destino:</strong> {viagem.cidadeDestino}
+            </p>
+            <p>
+              <strong>UF de Destino:</strong> {viagem.ufDestino}
+            </p>
+            <p>
+              <strong>Valor total:</strong> {viagem.valorTotal}
+            </p>
           </ExpandableContent>
         </AppCard>
       ))}

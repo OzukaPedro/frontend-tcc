@@ -1,11 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import styled from 'styled-components';
-import { Button, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
-import { Formik, Field, Form } from 'formik';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import api from "../../../utils/api";
+import styled from "styled-components";
+import {
+  Button,
+  TextField,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@mui/material";
+import { Formik, Field, Form } from "formik";
+import { useRouter } from "next/navigation";
 
 const Container = styled.div`
   padding: 2rem;
@@ -24,45 +31,125 @@ const Title = styled.h2`
   margin-bottom: 1.5rem;
 `;
 
-
 export default function FormularioUsuario({ params }) {
   const router = useRouter();
-  const { id } = params;
+  // const { id } = params;
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [tipo, setTipo] = useState("");
+  const [nome, setNome] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [rg, setRg] = useState("");
+  const [razaoSocial, setRazaoSocial] = useState("");
+  const [cnpj, setCnpj] = useState("");
+  const [inscricaoEstadual, setInscricaoEstadual] = useState("");
+  const [cep, setCep] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [uf, setUf] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [numero, setNumero] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [complemento, setComplemento] = useState("");
 
-  useEffect(() => {
-    if (id) {
-      axios.get(`/api/usuarios/${id}`).then((response) => {
-        setUsuario(response.data);
-      }).catch(error => console.error("Erro ao carregar usuário:", error));
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   if (id) {
+  //     api
+  //       .get(`/api/cadastros/`)
+  //       .then((response) => {
+  //         setUsuario(response.data);
+  //       })
+  //       .catch((error) => console.error("Erro ao carregar usuário:", error));
+  //   }
+  // }, [id]);
 
   const initialValues = {
-    tipo: usuario ? usuario.tipo : '',
-    nome: usuario ? usuario.nome : '',
-    cpf: usuario ? usuario.cpf : '',
-    cep: usuario ? usuario.cep : '',
-    cidade: usuario ? usuario.cidade : '',
-    uf: usuario ? usuario.uf : '',
-    endereco: usuario ? usuario.endereco : '',
-    numero: usuario ? usuario.numero : '',
-    bairro: usuario ? usuario.bairro : '',
-    complemento: usuario ? usuario.complemento : '',
+    tipo: usuario ? usuario.tipo : "",
+    nome: usuario ? usuario.nome : "",
+    cpf: usuario ? usuario.cpf : "",
+    rg: usuario ? usuario.rg : "",
+    razaoSocial: usuario ? usuario.razaoSocial : "",
+    cnpj: usuario ? usuario.cnpj : "",
+    inscricaoEstadual: usuario ? usuario.inscricaoEstadual : "",
+    cep: usuario ? usuario.cep : "",
+    cidade: usuario ? usuario.cidade : "",
+    uf: usuario ? usuario.uf : "",
+    endereco: usuario ? usuario.endereco : "",
+    numero: usuario ? usuario.numero : "",
+    bairro: usuario ? usuario.bairro : "",
+    complemento: usuario ? usuario.complemento : "",
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async () => {
     setLoading(true);
     try {
-      if (id) {
-        await axios.put(`/api/usuarios/${id}`, values);
-      } else {
-        await axios.post('/api/usuarios', values);
+      // Criação do cadastro
+      const cadastroResponse = await api.post(
+        `/api/cadastros`,
+        {
+          data: {
+            uf: uf,
+            cidade: cidade,
+            cep: cep,
+            logradouro: logradouro,
+            numero: numero,
+            bairro: bairro,
+            complemento: complemento,
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      // Recupera o ID do cadastro criado
+      const cadastroId = cadastroResponse.data.id;
+
+      if (tipo === "PF") {
+        // Criação do cadastro pessoa física com o ID do cadastro
+        await api.post(
+          "/api/cadastro-pessoa-fisicas",
+          {
+            data: {
+              cpf: cpf,
+              rg: rg,
+              nome: nome,
+              cadastro: cadastroId, // Adiciona o ID do cadastro
+            },
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+      } else if (tipo === "PJ") {
+        // Criação do cadastro pessoa jurídica com o ID do cadastro
+        await api.post(
+          "/api/cadastro-pessoa-juridicas",
+          {
+            data: {
+              razaoSocial: razaoSocial,
+              cnpj: cnpj,
+              inscricaoEstadual: inscricaoEstadual,
+              cadastro: cadastroId, // Adiciona o ID do cadastro
+            },
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
       }
-      router.push('/usuarios');
+
+      router.push("/cadastros");
     } catch (error) {
-      console.error('Erro ao salvar usuário:', error);
+      console.error("Erro ao salvar cadastro:", error);
     } finally {
       setLoading(false);
     }
@@ -71,13 +158,13 @@ export default function FormularioUsuario({ params }) {
   return (
     <Container>
       <Formulario>
-        <Title>{id ? 'Editar Usuário' : 'Criar Novo Usuário'}</Title>
+        <Title>{"Criar Novo Usuário"}</Title>
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ values }) => (
+          {({ values, setFieldValue }) => (
             <Form>
               <FormControl fullWidth margin="normal">
                 <InputLabel>Tipo</InputLabel>
@@ -86,47 +173,80 @@ export default function FormularioUsuario({ params }) {
                   name="tipo"
                   label="Tipo"
                   fullWidth
-                  value={values.tipo}
+                  value={tipo}
+                  onChange={(e) => setTipo(e.target.value)}
                 >
                   <MenuItem value="PF">Pessoa Física</MenuItem>
                   <MenuItem value="PJ">Pessoa Jurídica</MenuItem>
                 </Field>
               </FormControl>
 
-              <Field
-                name="nome"
-                label="Nome"
-                component={TextField}
-                fullWidth
-                margin="normal"
-              />
+              {tipo === "PF" && (
+                <>
+                  <Field
+                    name="nome"
+                    label="Nome"
+                    component={TextField}
+                    fullWidth
+                    margin="normal"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                  />
+                  <Field
+                    name="cpf"
+                    label="CPF"
+                    component={TextField}
+                    fullWidth
+                    margin="normal"
+                    inputProps={{ maxLength: 11 }}
+                    value={cpf}
+                    onChange={(e) => setCpf(e.target.value)}
+                  />
+                  <Field
+                    name="rg"
+                    label="RG"
+                    component={TextField}
+                    fullWidth
+                    margin="normal"
+                    inputProps={{ maxLength: 11 }}
+                    value={rg}
+                    onChange={(e) => setRg(e.target.value)}
+                  />
+                </>
+              )}
 
-              <Field
-                name="cpf"
-                label="CPF"
-                component={TextField}
-                fullWidth
-                margin="normal"
-                inputProps={{ maxLength: 11 }}
-              />
-              
-              <Field
-                name="rg"
-                label="RG"
-                component={TextField}
-                fullWidth
-                margin="normal"
-                inputProps={{ maxLength: 11 }}
-              />
-              
-              <Field
-                name="phone"
-                label="Telefone"
-                component={TextField}
-                fullWidth
-                margin="normal"
-                inputProps={{ maxLength: 11 }}
-              />
+              {tipo === "PJ" && (
+                <>
+                  <Field
+                    name="razaoSocial"
+                    label="Razão Social"
+                    component={TextField}
+                    fullWidth
+                    margin="normal"
+                    value={razaoSocial}
+                    onChange={(e) => setRazaoSocial(e.target.value)}
+                  />
+                  <Field
+                    name="cnpj"
+                    label="CNPJ"
+                    component={TextField}
+                    fullWidth
+                    margin="normal"
+                    inputProps={{ maxLength: 14 }}
+                    value={cnpj}
+                    onChange={(e) => setCnpj(e.target.value)}
+                  />
+                  <Field
+                    name="inscricaoEstadual"
+                    label="Inscrição Estadual"
+                    component={TextField}
+                    fullWidth
+                    margin="normal"
+                    value={inscricaoEstadual}
+                    onChange={(e) => setInscricaoEstadual(e.target.value)}
+                  />
+                </>
+              )}
 
               <Field
                 name="cep"
@@ -135,16 +255,18 @@ export default function FormularioUsuario({ params }) {
                 fullWidth
                 margin="normal"
                 inputProps={{ maxLength: 10 }}
+                value={cep}
+                onChange={(e) => setCep(e.target.value)}
               />
-              
               <Field
                 name="cidade"
                 label="Cidade"
                 component={TextField}
                 fullWidth
                 margin="normal"
+                value={cidade}
+                onChange={(e) => setCidade(e.target.value)}
               />
-
               <Field
                 name="uf"
                 label="UF"
@@ -152,38 +274,44 @@ export default function FormularioUsuario({ params }) {
                 fullWidth
                 margin="normal"
                 inputProps={{ maxLength: 2 }}
+                value={uf}
+                onChange={(e) => setUf(e.target.value)}
               />
-
               <Field
-                name="endereco"
-                label="Endereço"
+                name="logradouro"
+                label="Logradouro"
                 component={TextField}
                 fullWidth
                 margin="normal"
+                value={logradouro}
+                onChange={(e) => setLogradouro(e.target.value)}
               />
-
               <Field
                 name="numero"
                 label="Número"
                 component={TextField}
                 fullWidth
                 margin="normal"
+                value={numero}
+                onChange={(e) => setNumero(e.target.value)}
               />
-
               <Field
                 name="bairro"
                 label="Bairro"
                 component={TextField}
                 fullWidth
                 margin="normal"
+                value={bairro}
+                onChange={(e) => setBairro(e.target.value)}
               />
-
               <Field
                 name="complemento"
                 label="Complemento"
                 component={TextField}
                 fullWidth
                 margin="normal"
+                value={complemento}
+                onChange={(e) => setComplemento(e.target.value)}
               />
 
               <Button
@@ -192,9 +320,10 @@ export default function FormularioUsuario({ params }) {
                 color="primary"
                 fullWidth
                 disabled={loading}
-                sx={{ marginTop: '1rem' }}
+                sx={{ marginTop: "1rem" }}
+                onClick={handleSubmit}
               >
-                {loading ? 'Salvando...' : 'Salvar'}
+                {loading ? "Salvando..." : "Salvar"}
               </Button>
             </Form>
           )}

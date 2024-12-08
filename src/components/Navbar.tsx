@@ -1,9 +1,17 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Menu, MenuItem, Button, AppBar, Toolbar, Typography, Box } from '@mui/material';
-import styled from 'styled-components';
-import { useRouter } from 'next/navigation';
+import React, { useState } from "react";
+import {
+  Menu,
+  MenuItem,
+  Button,
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+} from "@mui/material";
+import styled from "styled-components";
+import { useRouter } from "next/navigation";
 
 const NavbarContainer = styled(AppBar)`
   background-color: #1d1d1d;
@@ -51,41 +59,65 @@ export default function Navbar() {
     <NavbarContainer>
       <Toolbar>
         <LogoContainer>
-          <Typography variant="h6" color="inherit" onClick={() => router.push('/')}>
+          <Typography
+            variant="h6"
+            color="inherit"
+            onClick={() => router.push("/dashboard")}
+          >
             Logo
           </Typography>
         </LogoContainer>
-        
-        <MenuContainer>
-          <NavItem onClick={() => router.push('/')}>Início</NavItem>
 
-          <NavItem onClick={(e) => handleMenuClick(e, 'cadastros')}>Cadastros</NavItem>
-          <NavItem onClick={(e) => handleMenuClick(e, 'contratos')}>Contratos</NavItem>
-          <NavItem onClick={(e) => handleMenuClick(e, 'viagens')}>Viagens</NavItem>
+        <MenuContainer>
+          <NavItem onClick={() => router.push("/")}>Início</NavItem>
+
+          <NavItem onClick={(e) => handleMenuClick(e, "cadastros")}>
+            Cadastros
+          </NavItem>
+          <NavItem onClick={(e) => handleMenuClick(e, "contratos")}>
+            Contratos
+          </NavItem>
+          <NavItem onClick={(e) => handleMenuClick(e, "viagens")}>
+            Viagens
+          </NavItem>
         </MenuContainer>
-        
+
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          {menuType === 'cadastros' && (
+          {menuType === "cadastros" && (
             <>
-              <MenuItem onClick={() => handleRedirect('/cadastros/novo')}>Novo Cadastro</MenuItem>
-              <MenuItem onClick={() => handleRedirect('/cadastros')}>Lista de Cadastros</MenuItem>
+              <MenuItem onClick={() => handleRedirect("/cadastros/novo")}>
+                Novo Cadastro
+              </MenuItem>
+              <MenuItem onClick={() => handleRedirect("/cadastros")}>
+                Lista de Cadastros
+              </MenuItem>
             </>
           )}
-          {menuType === 'contratos' && (
+          {menuType === "contratos" && (
             <>
-              <MenuItem onClick={() => handleRedirect('/contratos/novo')}>Novo Contrato</MenuItem>
-              <MenuItem onClick={() => handleRedirect('/contratos')}>Lista de Contratos</MenuItem>
-              <MenuItem onClick={() => handleRedirect('/contratos/modelos')}>Modelos</MenuItem>
+              <MenuItem onClick={() => handleRedirect("/contratos/novo")}>
+                Novo Contrato
+              </MenuItem>
+              <MenuItem onClick={() => handleRedirect("/contratos")}>
+                Lista de Contratos
+              </MenuItem>
+              <MenuItem onClick={() => handleRedirect("/contratos/modelos")}>
+                Modelos
+              </MenuItem>
             </>
           )}
-          {menuType === 'viagens' && (
+          {menuType === "viagens" && (
             <>
-              <MenuItem onClick={() => handleRedirect('/viagens/novo')}>Nova Viagem</MenuItem>
-              <MenuItem onClick={() => handleRedirect('/viagens')}>Lista de Viagens</MenuItem>
+              <MenuItem onClick={() => handleRedirect("/viagens/novo")}>
+                Nova Viagem
+              </MenuItem>
+              <MenuItem onClick={() => handleRedirect("/viagens")}>
+                Lista de Viagens
+              </MenuItem>
             </>
           )}
         </Menu>
