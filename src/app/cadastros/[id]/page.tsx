@@ -33,7 +33,7 @@ const Title = styled.h2`
 
 export default function FormularioUsuario({ params }) {
   const router = useRouter();
-  // const { id } = params;
+  const id = params;
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
   const [tipo, setTipo] = useState("");
@@ -51,16 +51,16 @@ export default function FormularioUsuario({ params }) {
   const [bairro, setBairro] = useState("");
   const [complemento, setComplemento] = useState("");
 
-  // useEffect(() => {
-  //   if (id) {
-  //     api
-  //       .get(`/api/cadastros/`)
-  //       .then((response) => {
-  //         setUsuario(response.data);
-  //       })
-  //       .catch((error) => console.error("Erro ao carregar usuário:", error));
-  //   }
-  // }, [id]);
+  useEffect(() => {
+    if (id) {
+      api
+        .get(`/api/cadastro-pessoa-fisicas/${id}`)
+        .then((response) => {
+          setUsuario(response.data.documentId);
+        })
+        .catch((error) => console.error("Erro ao carregar usuário:", error));
+    }
+  }, [id]);
 
   const initialValues = {
     tipo: usuario ? usuario.tipo : "",
@@ -82,69 +82,47 @@ export default function FormularioUsuario({ params }) {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Criação do cadastro
+      // Dados comuns para Cadastro (Pessoal ou Jurídico)
+
+      // Criação do Cadastro (Cadastro será criado primeiro)
       const cadastroResponse = await api.post(
-        `/api/cadastros`,
+        "/api/cadastros",
         {
           data: {
+            tipo: tipo,
             uf: uf,
             cidade: cidade,
             cep: cep,
             logradouro: logradouro,
             numero: numero,
             bairro: bairro,
-            complemento: complemento,
           },
         },
         {
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
-
-      // Recupera o ID do cadastro criado
-      const cadastroId = cadastroResponse.data.id;
-
-      if (tipo === "PF") {
-        // Criação do cadastro pessoa física com o ID do cadastro
-        await api.post(
-          "/api/cadastro-pessoa-fisicas",
-          {
-            data: {
-              cpf: cpf,
-              rg: rg,
-              nome: nome,
-              cadastro: cadastroId, // Adiciona o ID do cadastro
-            },
+      const cadastroId = cadastroResponse.data.data.id;
+      if (cadastroResponse.data.data.tipo === "PF") {
+        await api.post("/api/cadastro-pessoa-fisicas", {
+          data: {
+            nome: nome,
+            cpf: cpf,
+            rg: rg,
+            cadastro: cadastroId, // Vincula o cadastro criado
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-      } else if (tipo === "PJ") {
-        // Criação do cadastro pessoa jurídica com o ID do cadastro
-        await api.post(
-          "/api/cadastro-pessoa-juridicas",
-          {
-            data: {
-              razaoSocial: razaoSocial,
-              cnpj: cnpj,
-              inscricaoEstadual: inscricaoEstadual,
-              cadastro: cadastroId, // Adiciona o ID do cadastro
-            },
+        });
+      } else if (cadastroResponse.data.data.tipo === "PJ") {
+        await api.post("/api/cadastro-pessoa-juridicas", {
+          data: {
+            razaoSocial: razaoSocial,
+            cnpj: cnpj,
+            inscricaoEstadual: inscricaoEstadual,
+            cadastro: cadastroId, // Vincula o cadastro criado
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        });
       }
 
       router.push("/cadastros");
@@ -158,7 +136,7 @@ export default function FormularioUsuario({ params }) {
   return (
     <Container>
       <Formulario>
-        <Title>{"Criar Novo Usuário"}</Title>
+        <Title>{id ? "Editar Usuario " : "Criar Novo Usuário"}</Title>
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
@@ -303,15 +281,6 @@ export default function FormularioUsuario({ params }) {
                 margin="normal"
                 value={bairro}
                 onChange={(e) => setBairro(e.target.value)}
-              />
-              <Field
-                name="complemento"
-                label="Complemento"
-                component={TextField}
-                fullWidth
-                margin="normal"
-                value={complemento}
-                onChange={(e) => setComplemento(e.target.value)}
               />
 
               <Button

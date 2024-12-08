@@ -1,11 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import styled from 'styled-components';
-import { Button, TextField, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
-import { useRouter } from 'next/navigation';
-import { Formik, Field, Form } from 'formik';
+import React, { useState, useEffect } from "react";
+import api from "../../../utils/api";
+import styled from "styled-components";
+import {
+  Button,
+  TextField,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import { Formik, Field, Form } from "formik";
 
 const Container = styled.div`
   padding: 2rem;
@@ -32,33 +39,36 @@ export default function FormularioViagem({ params }) {
 
   useEffect(() => {
     if (id) {
-      axios.get(`/api/viagens/${id}`).then((response) => {
-        setViagem(response.data);
-      }).catch(error => console.error("Erro ao carregar viagem:", error));
+      api
+        .get(`/api/viagens/${id}`)
+        .then((response) => {
+          setViagem(response.data);
+        })
+        .catch((error) => console.error("Erro ao carregar viagem:", error));
     }
   }, [id]);
 
   const initialValues = {
-    nome: viagem ? viagem.nome : '',
-    valorTotal: viagem ? viagem.valorTotal : '',
-    tipo: viagem ? viagem.tipo : 'viagem',
-    cidadeOrigem: viagem ? viagem.cidadeOrigem : '',
-    ufOrigem: viagem ? viagem.ufOrigem : '',
-    cidadeDestino: viagem ? viagem.cidadeDestino : '',
-    ufDestino: viagem ? viagem.ufDestino : '',
+    nome: viagem ? viagem.nome : "",
+    valorTotal: viagem ? viagem.valorTotal : "",
+    tipo: viagem ? viagem.tipo : "viagem",
+    cidadeOrigem: viagem ? viagem.cidadeOrigem : "",
+    ufOrigem: viagem ? viagem.ufOrigem : "",
+    cidadeDestino: viagem ? viagem.cidadeDestino : "",
+    ufDestino: viagem ? viagem.ufDestino : "",
   };
 
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
       if (id) {
-        await axios.put(`/api/viagens/${id}`, values);
+        await api.put(`/api/viagens/${id}`, values);
       } else {
-        await axios.post('/api/viagens', values);
+        await api.post("/api/viagens", values);
       }
-      router.push('/viagens');
+      router.push("/viagens");
     } catch (error) {
-      console.error('Erro ao salvar viagem:', error);
+      console.error("Erro ao salvar viagem:", error);
     } finally {
       setLoading(false);
     }
@@ -67,7 +77,7 @@ export default function FormularioViagem({ params }) {
   return (
     <Container>
       <Formulario>
-        <Title>{id ? 'Editar Viagem' : 'Criar Nova Viagem'}</Title>
+        <Title>{id ? "Editar Viagem" : "Criar Nova Viagem"}</Title>
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
@@ -97,7 +107,7 @@ export default function FormularioViagem({ params }) {
                 </Field>
               </FormControl>
 
-              {values.tipo === 'viagem' && (
+              {values.tipo === "viagem" && (
                 <>
                   <Field
                     name="cidadeOrigem"
@@ -136,9 +146,9 @@ export default function FormularioViagem({ params }) {
                 color="primary"
                 fullWidth
                 disabled={loading}
-                sx={{ marginTop: '1rem' }}
+                sx={{ marginTop: "1rem" }}
               >
-                {loading ? 'Salvando...' : 'Salvar'}
+                {loading ? "Salvando..." : "Salvar"}
               </Button>
             </Form>
           )}

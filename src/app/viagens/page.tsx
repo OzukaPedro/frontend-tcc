@@ -42,28 +42,7 @@ const SearchContainer = styled.div`
 
 export default function ViagensPage() {
   const router = useRouter();
-  const [viagens, setViagens] = useState([
-    {
-      id: 1,
-      nome: "Viagem de Férias",
-      valorTotal: 1000,
-      tipo: "viagem",
-      cidadeOrigem: "São Paulo",
-      ufOrigem: "SP",
-      cidadeDestino: "Rio de Janeiro",
-      ufDestino: "RJ",
-    },
-    {
-      id: 2,
-      nome: "Viagem de Trabalho",
-      valorTotal: 2000,
-      tipo: "trabalho",
-      cidadeOrigem: "São Paulo",
-      ufOrigem: "SP",
-      cidadeDestino: "Curitiba",
-      ufDestino: "PR",
-    },
-  ]);
+  const [viagens, setViagens] = useState([]);
   const [busca, setBusca] = useState("");
   const [expandedViagem, setExpandedViagem] = useState(null);
 
@@ -73,8 +52,8 @@ export default function ViagensPage() {
 
   const fetchViagens = async (query = "") => {
     try {
-      const response = await api.get(`/api/viagems?busca=${query}`);
-      setViagens(response.data);
+      const response = await api.get(`/api/viagens?busca=${query}`);
+      setViagens(response.data.data);
     } catch (error) {
       console.error("Erro ao buscar viagens:", error);
     }
@@ -88,7 +67,7 @@ export default function ViagensPage() {
 
   const handleRemover = async (id) => {
     try {
-      await api.delete(`/api/viagems/${id}`);
+      await api.delete(`/api/viagens/${id}`);
       setViagens((prev) => prev.filter((viagem) => viagem.id !== id));
     } catch (error) {
       console.error("Erro ao remover viagem:", error);
@@ -146,7 +125,7 @@ export default function ViagensPage() {
               <strong>UF de Destino:</strong> {viagem.ufDestino}
             </p>
             <p>
-              <strong>Valor total:</strong> {viagem.valorTotal}
+              <strong>Valor total:</strong> {viagem.valor}
             </p>
           </ExpandableContent>
         </AppCard>
