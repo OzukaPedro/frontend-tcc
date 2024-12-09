@@ -17,11 +17,14 @@ const HomePage: React.FC = () => {
       <div className={styles.actionContainer}>
         <button
           className={styles.button}
-          onClick={() => router.push("/register")}
+          onClick={() => router.push("/RegisterScreen")}
         >
           Cadastrar
         </button>
-        <button className={styles.button} onClick={() => router.push("/login")}>
+        <button
+          className={styles.button}
+          onClick={() => router.push("/LoginScreen")}
+        >
           Entrar
         </button>
       </div>
