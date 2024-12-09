@@ -1,36 +1,35 @@
 "use client";
+
 import React from "react";
-import styles from "./page.module.css";
+import styles from "./page.module.css"; // Importe o arquivo CSS conforme necessário
 import { useRouter } from "next/navigation";
 
 const HomePage: React.FC = () => {
   const router = useRouter();
 
   return (
-    <div className={styles.hero}>
-      <div className={styles.overlay}></div>
-      <div className={styles.content}>
-        <h1 className={styles.title}>
-          Um alívio para os{" "}
-          <span className={styles.highlight}>Guia Turísticos</span>
-        </h1>
-        <p className={styles.subtitle}>
-          Nunca foi tão simples gerir seus clientes e contratos.
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Bem-vindo, Guias Turísticos!</h1>
+        <p className={styles.subtitle}>Sua jornada começa aqui</p>
+      </div>
+
+      <div className={styles.actionContainer}>
+        <button
+          className={styles.button}
+          onClick={() => router.push("/register")}
+        >
+          Cadastrar
+        </button>
+        <button className={styles.button} onClick={() => router.push("/login")}>
+          Entrar
+        </button>
+      </div>
+
+      <div className={styles.footer}>
+        <p className={styles.footerText}>
+          © 2024 Guias Turísticos. Todos os direitos reservados.
         </p>
-        <div className={styles.buttons}>
-          <button
-            className={styles.registerButton}
-            onClick={() => router.push(`/RegisterScreen`)}
-          >
-            Registrar
-          </button>
-          <button
-            className={styles.loginButton}
-            onClick={() => router.push(`/LoginScreen`)}
-          >
-            Entrar
-          </button>
-        </div>
       </div>
     </div>
   );

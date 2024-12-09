@@ -12,7 +12,7 @@ import {
   Select,
 } from "@mui/material";
 import { Formik, Field, Form } from "formik";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const Container = styled.div`
   padding: 2rem;
@@ -31,9 +31,9 @@ const Title = styled.h2`
   margin-bottom: 1.5rem;
 `;
 
-export default function FormularioUsuario({ params }) {
+export default function FormularioUsuario() {
   const router = useRouter();
-  const id = params;
+  const { id } = useParams(); // Usado para obter o ID da URL
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
   const [tipo, setTipo] = useState("");
@@ -49,78 +49,107 @@ export default function FormularioUsuario({ params }) {
   const [logradouro, setLogradouro] = useState("");
   const [numero, setNumero] = useState("");
   const [bairro, setBairro] = useState("");
-  const [complemento, setComplemento] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/LoginScreen"); // Se já estiver logado, redireciona para o Dashboard
+    }
+  }, [router]);
 
   useEffect(() => {
     if (id) {
       api
-        .get(`/api/cadastro-pessoa-fisicas/${id}`)
+        .get(`/api/cadastros/${id}`) // Mudado para "/api/cadastros" ao invés de "/api/cadastro-pessoa-fisicas"
         .then((response) => {
-          setUsuario(response.data.documentId);
+          setUsuario(response.data); // Atualize o estado com a resposta
         })
         .catch((error) => console.error("Erro ao carregar usuário:", error));
     }
   }, [id]);
 
   const initialValues = {
-    tipo: usuario ? usuario.tipo : "",
-    nome: usuario ? usuario.nome : "",
-    cpf: usuario ? usuario.cpf : "",
-    rg: usuario ? usuario.rg : "",
-    razaoSocial: usuario ? usuario.razaoSocial : "",
-    cnpj: usuario ? usuario.cnpj : "",
-    inscricaoEstadual: usuario ? usuario.inscricaoEstadual : "",
-    cep: usuario ? usuario.cep : "",
-    cidade: usuario ? usuario.cidade : "",
-    uf: usuario ? usuario.uf : "",
-    endereco: usuario ? usuario.endereco : "",
-    numero: usuario ? usuario.numero : "",
-    bairro: usuario ? usuario.bairro : "",
-    complemento: usuario ? usuario.complemento : "",
+    tipo: usuario?.tipo || "",
+    nome: usuario?.nome || "",
+    cpf: usuario?.cpf || "",
+    rg: usuario?.rg || "",
+    razaoSocial: usuario?.razaoSocial || "", // Para Pessoa Jurídica
+    cnpj: usuario?.cnpj || "",
+    inscricaoEstadual: usuario?.inscricaoEstadual || "",
+    cep: usuario?.cep || "",
+    cidade: usuario?.cidade || "",
+    uf: usuario?.uf || "",
+    logradouro: usuario?.logradouro || "",
+    numero: usuario?.numero || "",
+    bairro: usuario?.bairro || "",
   };
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      // Dados comuns para Cadastro (Pessoal ou Jurídico)
+      const data = {
+        tipo: values.tipo,
+        uf: values.uf,
+        cidade: values.cidade,
+        cep: values.cep,
+        logradouro: values.logradouro,
+        numero: values.numero,
+        bairro: values.bairro,
+        nome,
+        cpf,
+        rg,
+        razaoSocial,
+        cnpj,
+        inscricaoEstadual,
+      };
 
-      // Criação do Cadastro (Cadastro será criado primeiro)
-      const cadastroResponse = await api.post(
-        "/api/cadastros",
-        {
+      // Verifique se o tipo é PF ou PJ e envie os dados corretos
+      if (values.tipo === "PF") {
+        data.nome = values.nome;
+        data.cpf = values.cpf;
+        data.rg = values.rg;
+      } else if (values.tipo === "PJ") {
+        data.razaoSocial = values.razaoSocial;
+        data.cnpj = values.cnpj;
+        data.inscricaoEstadual = values.inscricaoEstadual;
+      }
+      console.log(values);
+
+      if (id > 0) {
+        // Se o ID existe, é uma edição
+        await api.put(`/api/cadastros/${id}`, {
           data: {
-            tipo: tipo,
-            uf: uf,
-            cidade: cidade,
-            cep: cep,
-            logradouro: logradouro,
-            numero: numero,
-            bairro: bairro,
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      const cadastroId = cadastroResponse.data.data.id;
-      if (cadastroResponse.data.data.tipo === "PF") {
-        await api.post("/api/cadastro-pessoa-fisicas", {
-          data: {
-            nome: nome,
-            cpf: cpf,
-            rg: rg,
-            cadastro: cadastroId, // Vincula o cadastro criado
+            uf: values.uf,
+            cidade: values.cidade,
+            cep: values.cep,
+            logradouro: values.logradouro,
+            numero: values.numero,
+            bairro: values.bairro,
+            nome: values.nome,
+            cpf: values.cpf,
+            rg: values.rg,
+            tipo: values.tipo,
+            razaoSocial: values.razaoSocial,
+            cnpj: values.cnpj,
+            inscricaoEstadual: values.inscricaoEstadual,
           },
         });
-      } else if (cadastroResponse.data.data.tipo === "PJ") {
-        await api.post("/api/cadastro-pessoa-juridicas", {
+      } else {
+        // Caso contrário, é uma criação
+        await api.post("/api/cadastros", {
           data: {
-            razaoSocial: razaoSocial,
-            cnpj: cnpj,
-            inscricaoEstadual: inscricaoEstadual,
-            cadastro: cadastroId, // Vincula o cadastro criado
+            uf: values.uf,
+            cidade: values.cidade,
+            cep: values.cep,
+            logradouro: values.logradouro,
+            numero: values.numero,
+            bairro: values.bairro,
+            nome: values.nome,
+            cpf: values.cpf,
+            rg: values.rg,
+            tipo: values.tipo,
+            razaoSocial: values.razaoSocial,
+            cnpj: values.cnpj,
+            inscricaoEstadual: values.inscricaoEstadual,
           },
         });
       }
@@ -136,7 +165,8 @@ export default function FormularioUsuario({ params }) {
   return (
     <Container>
       <Formulario>
-        <Title>{id ? "Editar Usuario " : "Criar Novo Usuário"}</Title>
+        <Title>{id ? "Editar Usuario" : "Criar Usuario"}</Title>{" "}
+        {/* Condicional no título */}
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
@@ -151,15 +181,15 @@ export default function FormularioUsuario({ params }) {
                   name="tipo"
                   label="Tipo"
                   fullWidth
-                  value={tipo}
-                  onChange={(e) => setTipo(e.target.value)}
+                  value={values.tipo}
+                  onChange={(e) => setFieldValue("tipo", e.target.value)}
                 >
                   <MenuItem value="PF">Pessoa Física</MenuItem>
                   <MenuItem value="PJ">Pessoa Jurídica</MenuItem>
                 </Field>
               </FormControl>
 
-              {tipo === "PF" && (
+              {values.tipo === "PF" && (
                 <>
                   <Field
                     name="nome"
@@ -167,8 +197,8 @@ export default function FormularioUsuario({ params }) {
                     component={TextField}
                     fullWidth
                     margin="normal"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
+                    value={values.nome}
+                    onChange={(e) => setFieldValue("nome", e.target.value)}
                   />
                   <Field
                     name="cpf"
@@ -177,8 +207,8 @@ export default function FormularioUsuario({ params }) {
                     fullWidth
                     margin="normal"
                     inputProps={{ maxLength: 11 }}
-                    value={cpf}
-                    onChange={(e) => setCpf(e.target.value)}
+                    value={values.cpf}
+                    onChange={(e) => setFieldValue("cpf", e.target.value)}
                   />
                   <Field
                     name="rg"
@@ -187,13 +217,13 @@ export default function FormularioUsuario({ params }) {
                     fullWidth
                     margin="normal"
                     inputProps={{ maxLength: 11 }}
-                    value={rg}
-                    onChange={(e) => setRg(e.target.value)}
+                    value={values.rg}
+                    onChange={(e) => setFieldValue("rg", e.target.value)}
                   />
                 </>
               )}
 
-              {tipo === "PJ" && (
+              {values.tipo === "PJ" && (
                 <>
                   <Field
                     name="razaoSocial"
@@ -201,8 +231,10 @@ export default function FormularioUsuario({ params }) {
                     component={TextField}
                     fullWidth
                     margin="normal"
-                    value={razaoSocial}
-                    onChange={(e) => setRazaoSocial(e.target.value)}
+                    value={values.razaoSocial}
+                    onChange={(e) =>
+                      setFieldValue("razaoSocial", e.target.value)
+                    }
                   />
                   <Field
                     name="cnpj"
@@ -211,8 +243,8 @@ export default function FormularioUsuario({ params }) {
                     fullWidth
                     margin="normal"
                     inputProps={{ maxLength: 14 }}
-                    value={cnpj}
-                    onChange={(e) => setCnpj(e.target.value)}
+                    value={values.cnpj}
+                    onChange={(e) => setFieldValue("cnpj", e.target.value)}
                   />
                   <Field
                     name="inscricaoEstadual"
@@ -220,8 +252,10 @@ export default function FormularioUsuario({ params }) {
                     component={TextField}
                     fullWidth
                     margin="normal"
-                    value={inscricaoEstadual}
-                    onChange={(e) => setInscricaoEstadual(e.target.value)}
+                    value={values.inscricaoEstadual}
+                    onChange={(e) =>
+                      setFieldValue("inscricaoEstadual", e.target.value)
+                    }
                   />
                 </>
               )}
@@ -233,8 +267,8 @@ export default function FormularioUsuario({ params }) {
                 fullWidth
                 margin="normal"
                 inputProps={{ maxLength: 10 }}
-                value={cep}
-                onChange={(e) => setCep(e.target.value)}
+                value={values.cep}
+                onChange={(e) => setFieldValue("cep", e.target.value)}
               />
               <Field
                 name="cidade"
@@ -242,8 +276,8 @@ export default function FormularioUsuario({ params }) {
                 component={TextField}
                 fullWidth
                 margin="normal"
-                value={cidade}
-                onChange={(e) => setCidade(e.target.value)}
+                value={values.cidade}
+                onChange={(e) => setFieldValue("cidade", e.target.value)}
               />
               <Field
                 name="uf"
@@ -252,8 +286,8 @@ export default function FormularioUsuario({ params }) {
                 fullWidth
                 margin="normal"
                 inputProps={{ maxLength: 2 }}
-                value={uf}
-                onChange={(e) => setUf(e.target.value)}
+                value={values.uf}
+                onChange={(e) => setFieldValue("uf", e.target.value)}
               />
               <Field
                 name="logradouro"
@@ -261,8 +295,8 @@ export default function FormularioUsuario({ params }) {
                 component={TextField}
                 fullWidth
                 margin="normal"
-                value={logradouro}
-                onChange={(e) => setLogradouro(e.target.value)}
+                value={values.logradouro}
+                onChange={(e) => setFieldValue("logradouro", e.target.value)}
               />
               <Field
                 name="numero"
@@ -270,8 +304,8 @@ export default function FormularioUsuario({ params }) {
                 component={TextField}
                 fullWidth
                 margin="normal"
-                value={numero}
-                onChange={(e) => setNumero(e.target.value)}
+                value={values.numero}
+                onChange={(e) => setFieldValue("numero", e.target.value)}
               />
               <Field
                 name="bairro"
@@ -279,8 +313,8 @@ export default function FormularioUsuario({ params }) {
                 component={TextField}
                 fullWidth
                 margin="normal"
-                value={bairro}
-                onChange={(e) => setBairro(e.target.value)}
+                value={values.bairro}
+                onChange={(e) => setFieldValue("bairro", e.target.value)}
               />
 
               <Button
@@ -288,11 +322,15 @@ export default function FormularioUsuario({ params }) {
                 variant="contained"
                 color="primary"
                 fullWidth
+                onSubmit={() => handleSubmit()}
                 disabled={loading}
                 sx={{ marginTop: "1rem" }}
-                onClick={handleSubmit}
               >
-                {loading ? "Salvando..." : "Salvar"}
+                {loading
+                  ? "Salvando..."
+                  : id
+                  ? "Salvar Alterações"
+                  : "Criar Usuario"}
               </Button>
             </Form>
           )}

@@ -1,33 +1,67 @@
 "use client";
 
-import React, { useState } from "react";
-import styles from "./LoginScreen.module.css";
-import Api from "../../utils/api";
+import React, { useState, useEffect } from "react";
+import api from "../../utils/api";
 import { useRouter } from "next/navigation";
+import { styled } from "@mui/system";
+import { Button, TextField } from "@mui/material";
+
+const LoginContainer = styled("div")`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f0f4f8;
+`;
+
+const FormContainer = styled("div")`
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+`;
+
+const Title = styled("h2")`
+  text-align: center;
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+`;
 
 const LoginScreen: React.FC = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
-  const [email, setEmail] = useState(""); // Inicializa como string vazia
-  const [senha, setSenha] = useState(""); // Inicializa como string vazia
+
+  // Verifica se o token está presente no localStorage
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard"); // Se já estiver logado, redireciona para o Dashboard
+    }
+  }, [router]);
 
   const handleLogin = async () => {
-    if (!email || !senha) {
+    if (!email || !password) {
       alert("Preencha todos os campos!");
       return;
     }
 
     try {
-      const response = await Api.post("/api/auth/local", {
+      const response = await api.post("/api/auth/local", {
         identifier: email,
-        password: senha,
+        password: password,
       });
-
+      const userId = response.data.user.id;
       const token = response.data.jwt;
       if (token) {
         localStorage.setItem("token", token);
+        localStorage.setItem("userId", userId);
         console.log("Login realizado com sucesso!");
-        console.log(token);
-        router.push("/dashboard"); // Redireciona para a home page
+        router.push("/dashboard");
       }
     } catch (error) {
       alert("Email ou senha incorretos");
@@ -35,42 +69,38 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className={styles.hero}>
-      <div className={styles.overlay}></div>
-      <div className={styles.content}>
-        <div className={styles.box}>
-          <h1 className={styles.registerTitle}>ENTRAR</h1>
-
-          {/* Campo de Email */}
-          <div className={styles.inputText}>
-            <p>Email</p>
-            <input
-              type="email"
-              className={styles.inputs}
-              value={email} // Controlado pelo estado
-              onChange={(e) => setEmail(e.target.value)} // Atualiza o estado
-            />
-          </div>
-
-          {/* Campo de Senha */}
-          <div className={styles.inputText}>
-            <p>Senha</p>
-            <input
-              type="password"
-              className={styles.inputs}
-              value={senha} // Controlado pelo estado
-              onChange={(e) => setSenha(e.target.value)} // Atualiza o estado
-            />
-          </div>
-
-          {/* Botão de Login */}
-
-          <button className={styles.buttons} onClick={handleLogin}>
-            Entrar
-          </button>
-        </div>
-      </div>
-    </div>
+    <LoginContainer>
+      <FormContainer>
+        <Title>Entrar</Title>
+        <TextField
+          label="Email"
+          type="email"
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          label="Senha"
+          type="password"
+          fullWidth
+          variant="outlined"
+          margin="normal"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={handleLogin}
+          style={{ marginTop: "20px" }}
+        >
+          Entrar
+        </Button>
+      </FormContainer>
+    </LoginContainer>
   );
 };
 

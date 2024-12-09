@@ -1,6 +1,7 @@
+"use client";
 import "./globals.css";
 import Navbar from "../components/Navbar";
-
+import { useRouter } from "next/router";
 export default function RootLayout({
   children,
 }: {
@@ -9,9 +10,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-      <Navbar />
+        <Navbar />
         {children}
-        </body>
+      </body>
     </html>
   );
 }

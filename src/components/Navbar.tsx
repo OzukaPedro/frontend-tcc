@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Menu,
   MenuItem,
@@ -9,13 +9,15 @@ import {
   Toolbar,
   Typography,
   Box,
+  Avatar,
+  IconButton,
 } from "@mui/material";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
 
 const NavbarContainer = styled(AppBar)`
   background-color: #1d1d1d;
-  position: sticky;
+  position: absolute;
 `;
 
 const LogoContainer = styled(Box)`
@@ -35,10 +37,23 @@ const NavItem = styled(Button)`
   margin: 0 1rem;
 `;
 
+const UserContainer = styled(Box)`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
 export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuType, setMenuType] = useState(null);
   const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Checa se o token está no localStorage (ou outro método de verificação)
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token); // Define se o usuário está autenticado ou não
+  }, []);
 
   const handleMenuClick = (event, type) => {
     setAnchorEl(event.currentTarget);
@@ -54,6 +69,15 @@ export default function Navbar() {
     router.push(path);
     handleClose();
   };
+  const handleLogout = () => {
+    router.push("/");
+    localStorage.clear();
+    handleClose();
+  };
+
+  const handleProfileRedirect = () => {
+    router.push("/perfil"); // Redireciona para a página de perfil
+  };
 
   return (
     <NavbarContainer>
@@ -64,13 +88,12 @@ export default function Navbar() {
             color="inherit"
             onClick={() => router.push("/dashboard")}
           >
-            Logo
+            TransportHub
           </Typography>
         </LogoContainer>
 
         <MenuContainer>
-          <NavItem onClick={() => router.push("/")}>Início</NavItem>
-
+          <NavItem onClick={() => router.push("/dashboard")}>Início</NavItem>
           <NavItem onClick={(e) => handleMenuClick(e, "cadastros")}>
             Cadastros
           </NavItem>
@@ -81,6 +104,28 @@ export default function Navbar() {
             Viagens
           </NavItem>
         </MenuContainer>
+
+        <UserContainer>
+          {isAuthenticated ? (
+            // Exibir o ícone de usuário se estiver autenticado
+            <div>
+              <button>Ícone de Usuário</button>
+              <Button onClick={handleLogout} color="secondary">
+                Sair
+              </Button>
+            </div>
+          ) : (
+            // Exibir os botões "Registrar" e "Entrar" se não estiver autenticado
+            <div>
+              <NavItem onClick={() => router.push("/RegisterScreen")}>
+                Registrar
+              </NavItem>
+              <NavItem onClick={() => router.push("/LoginScreen")}>
+                Entrar
+              </NavItem>
+            </div>
+          )}
+        </UserContainer>
 
         <Menu
           anchorEl={anchorEl}
@@ -118,6 +163,12 @@ export default function Navbar() {
               <MenuItem onClick={() => handleRedirect("/viagens")}>
                 Lista de Viagens
               </MenuItem>
+            </>
+          )}
+          {menuType === "perfil" && (
+            <>
+              <MenuItem onClick={handleProfileRedirect}>Meu Perfil</MenuItem>
+              <MenuItem onClick={() => handleLogout()}>Sair</MenuItem>
             </>
           )}
         </Menu>

@@ -38,6 +38,13 @@ export default function FormularioViagem({ params }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/LoginScreen"); // Se já estiver logado, redireciona para o Dashboard
+    }
+  }, [router]);
+
+  useEffect(() => {
     if (id) {
       api
         .get(`/api/viagens/${id}`)

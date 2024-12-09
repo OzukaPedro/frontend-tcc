@@ -47,6 +47,13 @@ export default function ViagensPage() {
   const [expandedViagem, setExpandedViagem] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/LoginScreen"); // Se já estiver logado, redireciona para o Dashboard
+    }
+  }, [router]);
+
+  useEffect(() => {
     fetchViagens();
   }, []);
 

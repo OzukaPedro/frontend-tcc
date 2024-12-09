@@ -43,7 +43,12 @@ export default function UsuariosPage() {
   const [usuarios, setUsuarios] = useState([]);
   const [busca, setBusca] = useState("");
   const [expandedUsuario, setExpandedUsuario] = useState(null);
-
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/LoginScreen"); // Se já estiver logado, redireciona para o Dashboard
+    }
+  }, [router]);
   useEffect(() => {
     fetchUsuarios();
   }, []);
@@ -51,18 +56,15 @@ export default function UsuariosPage() {
   const fetchUsuarios = async (query = "") => {
     try {
       const responsePf = await api.get(
-        `/api/cadastro-pessoa-fisicas?busca=${query}`,
+        `/api/cadastros?userId${localStorage.getItem("userId")}`,
         {
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      const responsePj = await api.get(
-        `/api/cadastro-pessoa-juridicas?busca=${query}`
-      );
 
-      setUsuarios([...responsePf.data.data, ...responsePj.data.data]); // Combina os resultados
+      setUsuarios([...responsePf.data.data]); // Combina os resultados
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);
     }
@@ -75,7 +77,8 @@ export default function UsuariosPage() {
 
   const handleRemover = async (id) => {
     try {
-      await api.delete(`/api/usuarios/${id}`);
+      await api.delete(`/api/cadastros/${id}`);
+      await api.delete(`/api/cadastros/${id - 1}`);
       setUsuarios((prev) => prev.filter((usuario) => usuario.id !== id));
     } catch (error) {
       console.error("Erro ao remover usuário:", error);
@@ -83,16 +86,17 @@ export default function UsuariosPage() {
   };
 
   const handleEdit = (id = null) => {
-    const route = id ? `/cadastros/${id}` : "/cadastros/novo";
+    console.log(id);
+    const route = id ? `/cadastros/${id - 1}` : "/cadastros/novo";
     router.push(route);
   };
 
   return (
     <AppContainer>
-      <h1>Lista de Usuários</h1>
+      <h1>Lista de Cadastros</h1>
       <div style={{ display: "flex", gap: "1rem", marginBottom: "3rem" }}>
         <SearchButton />
-        <IconButton onClick={handleEdit}>
+        <IconButton onClick={() => handleEdit()}>
           <Add />
         </IconButton>
       </div>
@@ -102,9 +106,11 @@ export default function UsuariosPage() {
           <Header>
             <User>
               <Avatar>
-                {usuario.cadastro?.tipo === "PF" ? <Person /> : <Business />}
+                {usuario.tipo === "PF" ? <Person /> : <Business />}
               </Avatar>
-              <h3>{usuario.nome}</h3>
+              <h3>
+                {usuario.tipo === "PF" ? usuario.nome : usuario.razaoSocial}
+              </h3>
             </User>
             <div>
               <IconButton onClick={() => handleExpandir(usuario.id)}>
@@ -123,31 +129,56 @@ export default function UsuariosPage() {
           </Header>
           <ExpandableContent isExpanded={expandedUsuario === usuario.id}>
             <p>
-              <strong>Tipo:</strong> {usuario.cadastro.tipo}
+              <strong>Tipo:</strong>{" "}
+              {usuario.tipo === "PF" ? "Pessoa Física" : "Pessoa Jurídica"}
+            </p>
+
+            {/* Campos específicos para PF */}
+            {usuario.tipo === "PF" && (
+              <>
+                <p>
+                  <strong>CPF:</strong> {usuario.cpf}
+                </p>
+                <p>
+                  <strong>RG:</strong> {usuario.rg}
+                </p>
+              </>
+            )}
+
+            {/* Campos específicos para PJ */}
+            {usuario.tipo === "PJ" && (
+              <>
+                <p>
+                  <strong>Razão Social:</strong> {usuario.razaoSocial}
+                </p>
+                <p>
+                  <strong>CNPJ:</strong> {usuario.cnpj}
+                </p>
+                <p>
+                  <strong>Inscrição Estadual:</strong>{" "}
+                  {usuario.inscricaoEstadual}
+                </p>
+              </>
+            )}
+
+            {/* Campos comuns para ambos PF e PJ */}
+            <p>
+              <strong>CEP:</strong> {usuario.cep}
             </p>
             <p>
-              <strong>CPF:</strong> {usuario.cpf}
+              <strong>Endereço:</strong> {usuario.logradouro}
             </p>
             <p>
-              <strong>RG:</strong> {usuario.rg}
+              <strong>Número:</strong> {usuario.numero}
             </p>
             <p>
-              <strong>CEP:</strong> {usuario.cadastro.cep}
+              <strong>Bairro:</strong> {usuario.bairro}
             </p>
             <p>
-              <strong>Endereço:</strong> {usuario.cadastro.logradouro}
+              <strong>Cidade:</strong> {usuario.cidade}
             </p>
             <p>
-              <strong>Número:</strong> {usuario.cadastro.numero}
-            </p>
-            <p>
-              <strong>Bairro:</strong> {usuario.cadastro.bairro}
-            </p>
-            <p>
-              <strong>Cidade:</strong> {usuario.cadastro.cidade}
-            </p>
-            <p>
-              <strong>UF:</strong> {usuario.cadastro.uf}
+              <strong>UF:</strong> {usuario.uf}
             </p>
           </ExpandableContent>
         </AppCard>
