@@ -8,6 +8,7 @@ import { Button, IconButton, TextField } from '@mui/material';
 import { ExpandMore, Delete, Print, Add } from '@mui/icons-material';
 import { AppContainer, AppCard } from "../../styles/global";
 import SearchButton  from '../../components/SearchButton';
+import api from "../../utils/api";
 
 const Container = styled.div`
   padding: 2rem;
@@ -37,26 +38,7 @@ const ExpandableContent = styled.div<{ isExpanded: boolean }>`
 
 export default function ContratosPage() {
   const router = useRouter();
-  const [contratos, setContratos] = useState([
-    {
-      id: 1,
-      titulo: 'Contrato de viagem',
-      dataIni: '01/01/2022',
-      dataFim: '31/01/2022',
-      valorTotal: 1000,
-      parcelado: true,
-      detalhes: 'Contrato de viagem para o cliente X.',
-    },
-    {
-      id: 2,
-      titulo: 'Contrato de transporte',
-      dataIni: '01/02/2022',
-      dataFim: '28/02/2022',
-      valorTotal: 2000,
-      parcelado: false,
-      detalhes: 'Contrato de transporte para o cliente Y.',
-    },
-  ]);
+  const [contratos, setContratos] = useState([]);
   const [busca, setBusca] = useState('');
   const [expandedContrato, setExpandedContrato] = useState(null);
 
@@ -66,8 +48,9 @@ export default function ContratosPage() {
 
   const fetchContratos = async (query = '') => {
     try {
-      const response = await axios.get(`/api/contratos?busca=${query}`);
-      setContratos(response.data);
+      const populate = "&populate=contratantes&populate=contratados&populate=viagems";
+      const response = await api.get(`/api/contratos?userId=${localStorage.getItem("userId")}${populate}`);
+      setContratos(response.data.data);
     } catch (error) {
       console.error('Erro ao buscar contratos:', error);
     }
@@ -81,7 +64,7 @@ export default function ContratosPage() {
 
   const handleRemover = async (id) => {
     try {
-      await axios.delete(`/api/contratos/${id}`);
+      await api.delete(`/api/contratos/${id}`);
       setContratos((prev) => prev.filter((contrato) => contrato.id !== id));
     } catch (error) {
       console.error('Erro ao remover contrato:', error);
@@ -107,9 +90,9 @@ export default function ContratosPage() {
         <AppCard key={contrato.id} isExpanded={expandedContrato === contrato.id}>
           <Header>
             <div>
-              <h3>{contrato.titulo}</h3>
-              <p>Data Início: {contrato.dataIni}</p>
-              <p>Data Fim: {contrato.dataFim}</p>
+              <h3>{contrato.descricao}</h3>
+              <p>Data Início: {contrato.dataInicio}</p>
+              <p>Data Fim: {contrato.dataFinal}</p>
             </div>
             <div>
               <IconButton onClick={() => window.print()}>
@@ -124,12 +107,12 @@ export default function ContratosPage() {
             </div>
           </Header>
           <ExpandableContent isExpanded={expandedContrato === contrato.id}>
-            <p><strong>Data Emissão:</strong> 01/01/2024</p>
-            <p><strong>Data Validade:</strong> 11/10/2024</p>
-            <p><strong>Contratante:</strong> Cliente X</p>
-            <p><strong>Contratado:</strong> Empresa Y</p>
-            <p><strong>Viagem:</strong> Foz do iguaçu</p>
-            <p><strong>Valor Total:</strong> R${contrato.valorTotal}</p>
+            <p><strong>Data Emissão:</strong> {contrato.dataEmissao}</p>
+            <p><strong>Data Validade:</strong> {contrato.dataValidade}</p>
+            <p><strong>Contratante:</strong> {contrato?.contratantes?.length > 0 && contrato?.contratantes[0].nome}</p>
+            <p><strong>Contratado:</strong> {contrato?.contratados?.length > 0 && contrato?.contratados[0].nome}</p>
+            <p><strong>Viagem:</strong> {contrato?.viagems?.length > 0 && contrato?.viagems[0].nome}</p>
+            <p><strong>Valor Total:</strong> R${contrato.valor}</p>
             <p><strong>Parcelado:</strong> {contrato.parcelado ? 'Sim' : 'Não'}</p>
           </ExpandableContent>
         </AppCard>
