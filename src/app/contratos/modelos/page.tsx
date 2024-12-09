@@ -8,6 +8,7 @@ import { ExpandMore, Delete, Print, Search, Add, Person, Business, Edit } from '
 import { useRouter } from 'next/navigation';
 import { AppContainer, AppCard } from "../../../styles/global";
 import SearchButton  from '../../../components/SearchButton';
+import api from "../../../utils/api";
 
 const Header = styled.div`
   display: flex;
@@ -31,39 +32,24 @@ const ExpandableContent = styled.div<{isExpanded}>`
 
 export default function Modelos() {
   const router = useRouter();
-  const [modelos, setModelos] = useState([
-    {
-      id: 1,
-      title: 'Modelo 1',
-      prologue: 'Prologo do modelo 1',
-      clauses: ['Cláusula 1', 'Cláusula 2'],
-      paragraph: 'Parágrafo único do modelo 1',
-    },
-    {
-      id: 2,
-      title: 'Modelo 2',
-      prologue: 'Prologo do modelo 2',
-      clauses: ['Cláusula 1', 'Cláusula 2'],
-      paragraph: 'Parágrafo único do modelo 2',
-    },
-  ]);
+  const [modelos, setModelos] = useState([]);
   const [busca, setBusca] = useState('');
   const [expandedUsuario, setExpandedUsuario] = useState(null);
 
   useEffect(() => {
-    fetchUsuarios();
+    fetchModelos();
   }, []);
 
-  const fetchUsuarios = async (query = '') => {
+  const fetchModelos = async (query = '') => {
     try {
-      const response = await axios.get(`/api/modelos?busca=${query}`);
-      setModelos(response.data);
+      const response = await api.get(`/api/modelos?userId=${localStorage.getItem("userId")}`);
+      setModelos(response.data.data);
     } catch (error) {
       console.error('Erro ao buscar usuários:', error);
     }
   };
 
-  const handleBusca = () => fetchUsuarios(busca);
+  const handleBusca = () => fetchModelos(busca);
 
   const handleExpandir = (id) => {
     setExpandedUsuario(expandedUsuario === id ? null : id);
@@ -71,7 +57,7 @@ export default function Modelos() {
 
   const handleRemover = async (id) => {    
     try {
-      await axios.delete(`/api/usuarios/${id}`);
+      await api.delete(`/api/modelos/${id}`);
       setModelos((prev) => prev.filter((usuario) => usuario.id !== id));
     } catch (error) {
       console.error('Erro ao remover usuário:', error);
@@ -88,35 +74,35 @@ export default function Modelos() {
       <h1>Lista de Modelos</h1>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem' }}>
         <SearchButton />
-        <IconButton onClick={handleEdit}>
+        <IconButton onClick={() => handleEdit(null)}>
           <Add />
         </IconButton>
       </div>
 
       {modelos.map((m) => (
-        <AppCard key={m.id} isExpanded={expandedUsuario === m.id}>
+        <AppCard key={m?.id} isExpanded={expandedUsuario === m?.id}>
           <Header>
             <User>
-              <h3>{m.title}</h3>
+              <h3>{m?.nomeModelo}</h3>
             </User>
             <div>
-              <IconButton onClick={() => handleExpandir(m.id)}>
+              <IconButton onClick={() => handleExpandir(m?.id)}>
                 <ExpandMore />
               </IconButton>
-              <IconButton onClick={() => handleEdit(m.id)}>
+              <IconButton onClick={() => handleEdit(m?.id)}>
                 <Edit />
               </IconButton>
-              <IconButton color="error" onClick={() => handleRemover(m.id)}>
+              <IconButton color="error" onClick={() => handleRemover(m?.id)}>
                 <Delete />
               </IconButton>
             </div>
           </Header>
           <ExpandableContent isExpanded={expandedUsuario === m.id}>
-            <p><strong>Prologo:</strong> {m.prologue}</p>
-            {m.clauses.map((c, i) => (
+            <p><strong>Prologo:</strong> {m?.prologo}</p>
+            {m?.clausulas && m?.clausulas.map((c, i) => (
               <p key={i}><strong>Cláusula {i + 1}:</strong> {c}</p>
             ))}
-            <p><strong>Parágrafo único:</strong> {m.paragraph}</p>
+            <p><strong>Parágrafo único:</strong> {m?.paragrafoUnico}</p>
           </ExpandableContent>
         </AppCard>
       ))}

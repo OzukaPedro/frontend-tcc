@@ -43,20 +43,15 @@ export default function UsuariosPage() {
   const [usuarios, setUsuarios] = useState([]);
   const [busca, setBusca] = useState("");
   const [expandedUsuario, setExpandedUsuario] = useState(null);
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/LoginScreen"); // Se já estiver logado, redireciona para o Dashboard
-    }
-  }, [router]);
+  
   useEffect(() => {
     fetchUsuarios();
   }, []);
-
+  
   const fetchUsuarios = async (query = "") => {
     try {
       const responsePf = await api.get(
-        `/api/cadastros?userId${localStorage.getItem("userId")}`,
+        `/api/cadastros?userId=${localStorage.getItem("userId")}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -64,7 +59,7 @@ export default function UsuariosPage() {
         }
       );
 
-      setUsuarios([...responsePf.data.data]); // Combina os resultados
+      setUsuarios([...responsePf.data.data]);
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);
     }
@@ -78,7 +73,6 @@ export default function UsuariosPage() {
   const handleRemover = async (id) => {
     try {
       await api.delete(`/api/cadastros/${id}`);
-      await api.delete(`/api/cadastros/${id - 1}`);
       setUsuarios((prev) => prev.filter((usuario) => usuario.id !== id));
     } catch (error) {
       console.error("Erro ao remover usuário:", error);

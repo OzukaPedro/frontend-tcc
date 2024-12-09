@@ -59,7 +59,11 @@ export default function ViagensPage() {
 
   const fetchViagens = async (query = "") => {
     try {
-      const response = await api.get(`/api/viagens?busca=${query}`);
+      let query = "";
+      if (busca) {
+        query = `?busca=${busca}`;
+      }
+      const response = await api.get(`/api/viagens${query}`);
       setViagens(response.data.data);
     } catch (error) {
       console.error("Erro ao buscar viagens:", error);

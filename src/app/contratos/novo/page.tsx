@@ -5,6 +5,8 @@ import { TextField } from 'formik-mui';
 import { MenuItem, Button, Checkbox, FormControlLabel } from '@mui/material';
 import axios from 'axios';
 import styled from 'styled-components';
+import api from "../../../utils/api";
+import { useRouter } from "next/navigation";
 
 const FormContainer = styled.div`
   max-width: 900px;
@@ -16,22 +18,38 @@ const FormContainer = styled.div`
 `;
 
 const ContractForm = () => {
+  const router = useRouter();
   const [modelos, setModelos] = useState([]);
   const [contratantes, setContratantes] = useState([]);
   const [viagens, setViagens] = useState([]);
 
   useEffect(() => {
-    axios.get('/api/modelos').then((res) => setModelos(res.data));
-    axios.get('/api/contratantes').then((res) => setContratantes(res.data));
-    axios.get('/api/viagens').then((res) => setViagens(res.data));
+    fetchData();
   }, []);
+  
+  const fetchData = () => {
+    try {
+      api.get('/api/modelos').then((res) => setModelos(res.data.data));
+      api.get('/api/cadastros').then((res) => setContratantes(res.data.data));
+      api.get('/api/viagens').then((res) => setViagens(res.data.data));
+      
+    } catch (error) {
+      console.error('Erro ao buscar modelos:', error);
+    }
+  }
   
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const response = await axios.post('/api/contratos', values);
-      alert('Contrato salvo com sucesso!');
-      console.log('Resposta da API:', response.data);
+      Object.keys(values).forEach(key => {
+        if (values[key] === '' || values[key] === null) {
+          delete values[key];
+        }
+      });
+      const response = await api.post('/api/contratos', {
+        data: values
+      });
       resetForm();
+      router.push('/contratos');
     } catch (error) {
       console.error('Erro ao salvar contrato:', error);
       alert('Erro ao salvar o contrato. Tente novamente.');
@@ -45,13 +63,16 @@ const ContractForm = () => {
       <h2>Novo contrato</h2>
       <Formik
         initialValues={{
-          modelo: '',
-          nome: '',
-          contratante: '',
-          viagem: '',
-          dataIni: '',
-          dataFim: '',
-          valorTotal: '',
+          modelos: null,
+          descricao: '',
+          contratantes: null,
+          contratados: null,
+          viagems: null,
+          dataInicio: '',
+          dataFinal: '',
+          dataEmissao: '2024-12-08',
+          dataValidade: '2024-12-08',
+          valor: '',
           parcelado: false,
         }}
         onSubmit={handleSubmit}
@@ -60,7 +81,7 @@ const ContractForm = () => {
           <Form>
             <Field
               component={TextField}
-              name="modelo"
+              name="modelos"
               label="Modelo"
               select
               fullWidth
@@ -68,22 +89,22 @@ const ContractForm = () => {
             >
               {modelos.map((modelo) => (
                 <MenuItem key={modelo.id} value={modelo.id}>
-                  {modelo.nome}
+                  {modelo.nomeModelo}
                 </MenuItem>
               ))}
             </Field>
 
             <Field
               component={TextField}
-              name="nome"
-              label="Nome"
+              name="descricao"
+              label="Descrição"
               fullWidth
               margin="normal"
             />
 
             <Field
               component={TextField}
-              name="contratante"
+              name="contratantes"
               label="Contratante"
               select
               fullWidth
@@ -98,7 +119,7 @@ const ContractForm = () => {
             
             <Field
               component={TextField}
-              name="contratado"
+              name="contratados"
               label="Contratado"
               select
               fullWidth
@@ -113,7 +134,7 @@ const ContractForm = () => {
 
             <Field
               component={TextField}
-              name="viagem"
+              name="viagems"
               label="Viagem"
               select
               fullWidth
@@ -128,7 +149,7 @@ const ContractForm = () => {
 
             <Field
               component={TextField}
-              name="dataIni"
+              name="dataInicio"
               label="Data Início"
               type="date"
               InputLabelProps={{ shrink: true }}
@@ -138,7 +159,7 @@ const ContractForm = () => {
 
             <Field
               component={TextField}
-              name="dataFim"
+              name="dataFinal"
               label="Data Fim"
               type="date"
               InputLabelProps={{ shrink: true }}
@@ -148,7 +169,7 @@ const ContractForm = () => {
 
             <Field
               component={TextField}
-              name="valorTotal"
+              name="valor"
               label="Valor Total"
               type="number"
               fullWidth
