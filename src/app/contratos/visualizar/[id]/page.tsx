@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { PageContainer, Title, Section, Footer, Signatures, Container } from "./styles";
 import { useParams } from "next/navigation";
 import api from "../../../../utils/api";
@@ -28,7 +28,6 @@ const cadastroDefault = {
 
 export default function ContratoPage() {
   const { id } = useParams();
-  const componentRef = useRef();
   const [data, setData] = useState({
     id: null,
     documentId: "",
@@ -149,7 +148,7 @@ export default function ContratoPage() {
   
   return (
     <Container>
-      <PageContainer ref={componentRef}>
+      <PageContainer>
         <Title>CONTRATO DE VIAGEM</Title>
         <Section>
           <strong>Contratado - </strong>{`${data.contratado.nome}, CNPJ. ${data.contratado.cnpj}, ${data.contratado.logradouro} nº ${data.contratado.numero}, ${data.contratado.bairro}, ${data.contratado.cidade} - ${data.contratado.uf}`}
