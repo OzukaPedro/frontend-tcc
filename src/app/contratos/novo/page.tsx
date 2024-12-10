@@ -12,7 +12,7 @@ const FormContainer = styled.div`
   max-width: 900px;
   margin: 2rem auto;
   padding: 2rem;
-  background-color: #f7f7f7;
+  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 `;

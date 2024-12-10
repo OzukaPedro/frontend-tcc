@@ -5,7 +5,7 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import { Button, IconButton, TextField } from '@mui/material';
-import { ExpandMore, Delete, Print, Add } from '@mui/icons-material';
+import { ExpandMore, Delete, Print, Add, Visibility } from '@mui/icons-material';
 import { AppContainer, AppCard } from "../../styles/global";
 import SearchButton  from '../../components/SearchButton';
 import api from "../../utils/api";
@@ -75,6 +75,10 @@ export default function ContratosPage() {
     if(id) return router.push(`/contratos/${id}`);
     return router.push(`/contratos/novo`);
   }
+  
+  const handleView = (id) => {
+    router.push(`/contratos/visualizar/${id}`);
+  };
 
   return (
     <AppContainer>
@@ -95,8 +99,8 @@ export default function ContratosPage() {
               <p>Data Fim: {contrato.dataFinal}</p>
             </div>
             <div>
-              <IconButton onClick={() => window.print()}>
-                <Print />
+              <IconButton onClick={() => handleView(contrato.documentId)}>
+                <Visibility />
               </IconButton>
               <IconButton onClick={() => handleExpandir(contrato.id)}>
                 <ExpandMore />

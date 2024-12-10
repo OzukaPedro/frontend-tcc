@@ -2,6 +2,12 @@
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import { useRouter } from "next/router";
+import styled from "styled-components";
+
+const Container = styled.div`
+  margin: 140px auto;
+`;
+
 export default function RootLayout({
   children,
 }: {
@@ -11,7 +17,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        {children}
+        <Container>
+          {children}
+        </Container>
       </body>
     </html>
   );
