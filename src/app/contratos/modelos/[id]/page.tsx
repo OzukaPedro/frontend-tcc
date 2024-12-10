@@ -7,15 +7,23 @@ import { Box, TextField, Button, Typography } from '@mui/material';
 import styled from 'styled-components';
 import api from "../../../../utils/api";
 
+export const Container = styled.div`
+`;
+
+export const Formulario = styled.div`
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin: 0 auto;
+`;
+
 const FormContainer = styled(Box)`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   padding: 24px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: auto;
 `;
 
 const ClauseContainer = styled(Box)`
@@ -32,6 +40,13 @@ const Actions = styled(Box)`
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+`;
+
+const BtnCls = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 40px;
 `;
 
 export default function ContractModelForm() {
@@ -100,93 +115,105 @@ FORO: As partes comprometem-se a cumprir este contrato fielmente em todas as sua
   }
 
   return (
-    <Formik
-      initialValues={initialValues}
-      enableReinitialize
-      onSubmit={handleSubmit}
-    >
-      {({ values, errors }) => (
-        <Form>
-          <FormContainer>
-            <Typography variant="h5">
-              {id === 'new' ? 'Cadastrar Modelo de Contrato' : 'Editar Modelo de Contrato'}
-            </Typography>
+    <Container>
+      <Formulario>
+        <Formik
+          initialValues={initialValues}
+          enableReinitialize
+          onSubmit={handleSubmit}
+        >
+          {({ values, errors }) => (
+            <Form>
+              <FormContainer>
+                <Typography variant="h5">
+                  {id === 'novo' ? 'Cadastrar Modelo de Contrato' : 'Editar Modelo de Contrato'}
+                </Typography>
 
-            <Field
-              as={TextField}
-              name="nomeModelo"
-              label="Nome do Modelo"
-              fullWidth
-              error={!!errors.modelName}
-              helperText={errors.modelName}
-            />
+                <Field
+                  as={TextField}
+                  name="nomeModelo"
+                  label="Nome do Modelo"
+                  fullWidth
+                  error={!!errors.modelName}
+                  helperText={errors.modelName}
+                />
 
-            <Field
-              as={TextField}
-              name="prologo"
-              label="Prólogo"
-              multiline
-              rows={4}
-              fullWidth
-              error={!!errors.prologue}
-              helperText={errors.prologue}
-            />
+                <Field
+                  as={TextField}
+                  name="prologo"
+                  label="Prólogo"
+                  multiline
+                  rows={4}
+                  fullWidth
+                  error={!!errors.prologue}
+                  helperText={errors.prologue}
+                />
 
-            <Typography variant="h6">Cláusulas</Typography>
-            <FieldArray
-              name="clausulas"
-              render={(arrayHelpers) => (
-                <>
-                  {values.clausulas.map((clause, index) => (
-                    <ClauseContainer key={index}>
-                      <TextField
-                        name={`clauses.${index}`}
-                        label={`Cláusula ${index + 1}`}
-                        value={clause}
-                        onChange={(e) => arrayHelpers.replace(index, e.target.value)}
-                        multiline
-                        rows={3}
-                        fullWidth
-                        error={!!errors.clauses}
-                      />
-                      <Actions>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={() => arrayHelpers.remove(index)}
-                          disabled={values.clausulas.length === 1}
-                        >
-                          Remover
+                <Typography variant="h6">Cláusulas</Typography>
+                <FieldArray
+                  name="clausulas"
+                  render={(arrayHelpers) => (
+                    <>
+                      {values.clausulas.map((clause, index) => (
+                        <ClauseContainer key={index}>
+                          <TextField
+                            name={`clauses.${index}`}
+                            label={`Cláusula ${index + 1}`}
+                            value={clause}
+                            onChange={(e) => arrayHelpers.replace(index, e.target.value)}
+                            multiline
+                            rows={3}
+                            fullWidth
+                            error={!!errors.clauses}
+                          />
+                          <Actions>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              onClick={() => arrayHelpers.remove(index)}
+                              disabled={values.clausulas.length === 1}
+                            >
+                              Remover
+                            </Button>
+                          </Actions>
+                        </ClauseContainer>
+                      ))}
+                      <BtnCls>
+                        <Button variant="contained" onClick={() => arrayHelpers.push('')}>
+                          Adicionar Cláusula
                         </Button>
-                      </Actions>
-                    </ClauseContainer>
-                  ))}
-                  <Button variant="contained" onClick={() => arrayHelpers.push('')}>
-                    Adicionar Cláusula
+                      </BtnCls>
+                    </>
+                  )}
+                />
+
+                <Field
+                  as={TextField}
+                  name="paragrafoUnico"
+                  label="Parágrafo Único"
+                  multiline
+                  rows={4}
+                  fullWidth
+                  error={!!errors.uniqueParagraph}
+                  helperText={errors.uniqueParagraph}
+                />
+
+                <Actions>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ marginTop: "1rem" }}
+                  >
+                    Salvar
                   </Button>
-                </>
-              )}
-            />
-
-            <Field
-              as={TextField}
-              name="paragrafoUnico"
-              label="Parágrafo Único"
-              multiline
-              rows={4}
-              fullWidth
-              error={!!errors.uniqueParagraph}
-              helperText={errors.uniqueParagraph}
-            />
-
-            <Actions>
-              <Button type="submit" variant="contained" color="primary">
-                Salvar
-              </Button>
-            </Actions>
-          </FormContainer>
-        </Form>
-      )}
-    </Formik>
+                </Actions>
+              </FormContainer>
+            </Form>
+          )}
+        </Formik>
+      </Formulario>
+    </Container>
   );
 }
