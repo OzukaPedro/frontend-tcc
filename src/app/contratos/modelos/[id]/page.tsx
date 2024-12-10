@@ -7,10 +7,10 @@ import { Box, TextField, Button, Typography } from '@mui/material';
 import styled from 'styled-components';
 import api from "../../../../utils/api";
 
-export const Container = styled.div`
+const Container = styled.div`
 `;
 
-export const Formulario = styled.div`
+const Formulario = styled.div`
   background: #fff;
   padding: 2rem;
   border-radius: 8px;
